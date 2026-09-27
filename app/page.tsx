@@ -1,4 +1,5 @@
 import Hero from "./components/Hero";
+import FakedTerminal from "./components/FakedTerminal";
 
 export default function Home() {
   return (
@@ -9,7 +10,15 @@ export default function Home() {
           aria-label="Install ViCode"
           className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-6"
         >
-          <Hero />
+          <div
+            data-hero-layout
+            className="flex flex-col gap-8 lg:flex-row lg:items-start"
+          >
+            <div className="min-w-0 flex-1">
+              <Hero />
+            </div>
+            <FakedTerminal />
+          </div>
         </section>
       </main>
     </div>
