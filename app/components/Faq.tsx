@@ -6,7 +6,7 @@ export default function Faq() {
       {FAQ_ITEMS.map((item) => (
         <details
           key={item.question}
-          className="group min-w-0 rounded-lg border border-zinc-800 bg-black p-4"
+          className="group min-w-0 rounded-lg border border-zinc-800 bg-black p-4 transition-colors hover:border-zinc-700"
         >
           <summary className="cursor-pointer font-mono text-sm text-zinc-100 transition-colors hover:text-white">
             {item.question}

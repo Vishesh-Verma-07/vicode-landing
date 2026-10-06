@@ -16,20 +16,20 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://vicode.dev"),
-  title: "ViCode — Terminal AI coding agent | Install with npm install -g vicode-ai",
+  title: "ViCode — Terminal AI coding partner",
   description:
-    "ViCode is a Terminal AI coding agent that lives in your project directory. Install with npm install -g vicode-ai and fix bugs from your terminal.",
+    "ViCode is a conversational CLI coding partner. Install with npm install -g vicode-ai and build with control from your terminal.",
   openGraph: {
-    title: "ViCode — Terminal AI coding agent",
+    title: "ViCode — Terminal AI coding partner",
     description:
-      "Install ViCode with npm install -g vicode-ai. A Terminal AI coding agent for Terminal-first Developers.",
+      "Install ViCode with npm install -g vicode-ai. A conversational CLI coding partner for terminal-first developers.",
     type: "website",
   },
   twitter: {
     card: "summary",
-    title: "ViCode — Terminal AI coding agent",
+    title: "ViCode — Terminal AI coding partner",
     description:
-      "Install ViCode with npm install -g vicode-ai. A Terminal AI coding agent for Terminal-first Developers.",
+      "Install ViCode with npm install -g vicode-ai. A conversational CLI coding partner for terminal-first developers.",
   },
 };
 

@@ -10,7 +10,7 @@ export default function CommandsReference() {
         {SLASH_COMMANDS.map((item) => (
           <li
             key={item.command}
-            className="flex min-w-0 flex-col gap-1 rounded-lg border border-zinc-800 bg-black p-3"
+            className="flex min-w-0 flex-col gap-1 rounded-lg border border-zinc-800 bg-black p-3 transition-colors hover:border-zinc-700"
           >
             <span className="font-mono text-sm font-semibold text-emerald-400">
               {item.command}

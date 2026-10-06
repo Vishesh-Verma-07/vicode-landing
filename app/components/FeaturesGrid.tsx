@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "motion/react";
 import { GITHUB_URL } from "../lib/links";
 import { FEATURES } from "../lib/features";
 
@@ -9,10 +12,12 @@ export default function FeaturesGrid() {
         className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
       >
         {FEATURES.map((feature) => (
-          <li
+          <motion.li
             key={feature.title}
             data-feature-card
-            className="flex min-w-0 flex-col gap-2 rounded-lg border border-zinc-800 bg-black p-4"
+            whileHover={{ scale: 1.01, y: -2 }}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            className="flex min-w-0 flex-col gap-2 rounded-lg border border-zinc-800 bg-black p-4 transition-colors hover:border-zinc-700"
           >
             <h3 className="font-mono text-sm font-semibold text-zinc-100">
               {feature.title}
@@ -23,7 +28,7 @@ export default function FeaturesGrid() {
             <p className="mt-auto font-mono text-xs leading-relaxed text-zinc-500">
               {feature.detail}
             </p>
-          </li>
+          </motion.li>
         ))}
       </ul>
       <p className="font-mono text-xs text-zinc-500">

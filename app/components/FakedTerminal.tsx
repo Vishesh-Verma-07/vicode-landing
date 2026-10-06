@@ -22,7 +22,7 @@ function StepContent({ id }: { id: TerminalStepId }) {
     case "search":
       return (
         <p>
-          <span className="text-sky-300">search “login”</span>
+          <span className="text-sky-300">search &quot;login&quot;</span>
           <span className="text-zinc-400"> — 3 matches in src/auth.ts</span>
         </p>
       );
@@ -39,9 +39,7 @@ function StepContent({ id }: { id: TerminalStepId }) {
           <p className="text-zinc-500">--- a/src/auth.ts</p>
           <p className="text-zinc-500">+++ b/src/auth.ts</p>
           <p className="text-red-400">- login(user)</p>
-          <p className="text-green-400">
-            + if (!password) throw new Error(&quot;empty password&quot;)
-          </p>
+          <p className="text-green-400">+ if (!password) throw new Error(&quot;empty password&quot;)</p>
           <p className="text-green-400">+ login(user, password)</p>
         </div>
       );

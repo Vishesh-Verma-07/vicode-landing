@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { MODES, type ModeId } from "../lib/modes";
 
 export default function ModesShowcase() {
@@ -71,29 +72,36 @@ export default function ModesShowcase() {
         <span className="select-none text-zinc-500"> ›</span>
       </p>
 
-      <div
-        className={`flex flex-col gap-3 rounded-lg border border-zinc-800 border-l-4 bg-black p-4 ${active.barClass}`}
-      >
-        <p className="text-base leading-relaxed text-zinc-300">
-          {active.behavior}
-        </p>
-        <p className="font-mono text-sm leading-relaxed text-zinc-400">
-          {active.scopeNote}
-        </p>
-        <ul
-          aria-label={`Tools visible in ${active.id} mode`}
-          className="flex flex-wrap gap-2"
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={modeId}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+          className={`flex flex-col gap-3 rounded-lg border border-zinc-800 border-l-4 bg-black p-4 ${active.barClass}`}
         >
-          {active.tools.map((tool) => (
-            <li
-              key={tool}
-              className="rounded border border-zinc-800 bg-zinc-900 px-2 py-0.5 font-mono text-xs text-zinc-200"
-            >
-              {tool}
-            </li>
-          ))}
-        </ul>
-      </div>
+          <p className="text-base leading-relaxed text-zinc-300">
+            {active.behavior}
+          </p>
+          <p className="font-mono text-sm leading-relaxed text-zinc-400">
+            {active.scopeNote}
+          </p>
+          <ul
+            aria-label={`Tools visible in ${active.id} mode`}
+            className="flex flex-wrap gap-2"
+          >
+            {active.tools.map((tool) => (
+              <li
+                key={tool}
+                className="rounded border border-zinc-800 bg-zinc-900 px-2 py-0.5 font-mono text-xs text-zinc-200"
+              >
+                {tool}
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+      </AnimatePresence>
 
       <p className="font-mono text-xs text-zinc-500">
         Tab through the modes — in the ViCode CLI, the Tab key cycles build →

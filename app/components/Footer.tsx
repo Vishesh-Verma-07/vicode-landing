@@ -3,10 +3,10 @@ import { GITHUB_URL, NPM_URL } from "../lib/links";
 export default function Footer() {
   return (
     <footer className="border-t border-zinc-800 bg-[#09090b]">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 px-4 py-8 font-mono text-sm text-zinc-400 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-8 font-mono text-sm text-zinc-400 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <p>
           <span className="text-zinc-200">ViCode</span> — Terminal AI coding
-          agent · MIT license · by Vishesh Verma
+          partner · MIT license · by Vishesh Verma
         </p>
         <div className="flex items-center gap-4">
           <a
