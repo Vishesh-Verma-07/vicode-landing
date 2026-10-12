@@ -3,7 +3,7 @@ import { render, screen, fireEvent, act } from "@testing-library/react";
 import React from "react";
 
 import FakedTerminal from "@/app/components/FakedTerminal";
-import Home from "@/app/page";
+import Guide from "@/app/guide/page";
 
 /**
  * Page-level behavioral seam for issue #4 (Faked Terminal bug-fix loop).
@@ -133,7 +133,7 @@ describe("faked terminal bug-fix loop (issue #4)", () => {
 
   it("page exposes the terminal next to the hero with a stacked mobile layout", () => {
     mockReducedMotion(true);
-    const { container } = render(<Home />);
+    const { container } = render(<Guide />);
 
     const install = container.querySelector("#install");
     expect(install).not.toBeNull();

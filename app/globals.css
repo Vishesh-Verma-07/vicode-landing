@@ -1,14 +1,40 @@
 @import "tailwindcss";
 
 :root {
-  --background: #09090b;
-  --foreground: #e4e4e7;
+  --background: #0A0A0B;
+  --background-secondary: #111113;
+  --background-elevated: #171719;
+  --border: #29292E;
+  --border-strong: #3F3F46;
+  --text-primary: #F4F4F5;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
+  --accent: #B8F56A;
+  --accent-dim: #8FCB4A;
+  --accent-bg: rgba(184, 245, 106, 0.1);
+  --accent-border: rgba(184, 245, 106, 0.3);
+  --discuss-color: #38BDF8;
+  --plan-color: #FBBF24;
+  --build-color: #4ADE80;
   color-scheme: dark;
 }
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background-secondary: var(--background-secondary);
+  --color-background-elevated: var(--background-elevated);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-accent-dim: var(--accent-dim);
+  --color-accent-bg: var(--accent-bg);
+  --color-accent-border: var(--accent-border);
+  --color-discuss: var(--discuss-color);
+  --color-plan: var(--plan-color);
+  --color-build: var(--build-color);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -21,13 +47,13 @@ html {
 
 body {
   background: var(--background);
-  color: var(--foreground);
+  color: var(--text-primary);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
 ::selection {
-  background: rgba(52, 211, 153, 0.3);
-  color: #fafafa;
+  background: var(--accent-bg);
+  color: var(--text-primary);
 }
 
 ::-webkit-scrollbar {
@@ -36,14 +62,133 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #09090b;
+  background: var(--background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: var(--border);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f3f46;
+  background: var(--border-strong);
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes terminal-typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-pulse-subtle {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+.focus-visible-ring:focus-visible {
+  outline: none;
+  ring: 2px;
+  ring-color: var(--accent);
+  ring-offset: 2px;
+  ring-offset-color: var(--background);
+}
+
+.terminal-window {
+  background: #000;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.terminal-titlebar {
+  background: var(--background-elevated);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.terminal-dot-close { background: #FF5F57; }
+.terminal-dot-minimize { background: #FEBC2E; }
+.terminal-dot-maximize { background: #28CA42; }
+
+.terminal-body {
+  padding: 16px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.terminal-prompt {
+  color: var(--accent);
+}
+
+.terminal-user-input {
+  color: var(--text-primary);
+}
+
+.terminal-assistant {
+  color: var(--text-secondary);
+}
+
+.terminal-status {
+  color: var(--discuss-color);
+}
+
+.terminal-plan {
+  color: var(--plan-color);
+}
+
+.terminal-build {
+  color: var(--build-color);
+}
+
+.terminal-success {
+  color: var(--build-color);
+}
+
+.terminal-dim {
+  color: var(--text-muted);
 }

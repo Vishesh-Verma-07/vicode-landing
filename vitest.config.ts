@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import path from "node:path";
 
@@ -14,5 +14,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
     include: ["**/*.test.{ts,tsx}"],
+    // Local agent worktrees (.kilo/worktrees/*) hold stale copies of the suite
+    exclude: [...configDefaults.exclude, "**/.kilo/**"],
   },
 });

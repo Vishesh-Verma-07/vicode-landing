@@ -12,7 +12,7 @@ vi.mock("next/font/google", () => ({
 import { metadata } from "@/app/layout";
 import CommandsReference from "@/app/components/CommandsReference";
 import Faq from "@/app/components/Faq";
-import Home from "@/app/page";
+import Guide from "@/app/guide/page";
 
 /**
  * Page-level behavioral seam for issue #7 (Commands + FAQ + ship check).
@@ -99,7 +99,7 @@ describe("commands + faq + ship check (issue #7)", () => {
   });
 
   it("page assembles commands and faq with no mobile-overflow regressions", () => {
-    const { container } = render(<Home />);
+    const { container } = render(<Guide />);
 
     const commands = container.querySelector("#commands");
     expect(commands).not.toBeNull();

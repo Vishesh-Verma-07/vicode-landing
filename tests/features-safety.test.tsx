@@ -5,7 +5,7 @@ import React from "react";
 import FeaturesGrid from "@/app/components/FeaturesGrid";
 import SafetyStrip from "@/app/components/SafetyStrip";
 import { GITHUB_URL } from "@/app/lib/links";
-import Home from "@/app/page";
+import Guide from "@/app/guide/page";
 
 /**
  * Page-level behavioral seam for issue #6 (Features grid + Blast Radius strip).
@@ -86,7 +86,7 @@ describe("features grid + blast radius strip (issue #6)", () => {
   });
 
   it("page exposes features and safety as their own sections", () => {
-    const { container } = render(<Home />);
+    const { container } = render(<Guide />);
 
     const features = container.querySelector("#features");
     expect(features).not.toBeNull();

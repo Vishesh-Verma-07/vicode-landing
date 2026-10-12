@@ -3,20 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
-import { GITHUB_URL, NPM_URL } from "../lib/links";
+import { GITHUB_URL } from "../lib/links";
 
 const NAV_LINKS = [
-  { href: "#modes", label: "Modes" },
-  { href: "#features", label: "Features" },
-  { href: "#commands", label: "Commands" },
-  { href: "#faq", label: "FAQ" },
+  { href: "#product", label: "Product" },
+  { href: "#philosophy", label: "Philosophy" },
 ];
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-800 bg-[#09090b]/95 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur-sm">
       <nav
         aria-label="Primary"
         className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-4 px-4 sm:px-6"
@@ -24,28 +22,23 @@ export default function Navbar() {
         <Link
           href="/"
           aria-label="ViCode home"
-          className="flex items-center gap-2.5 font-mono text-sm font-semibold tracking-tight text-zinc-100"
+          className="flex items-center gap-2.5 font-mono text-sm font-semibold tracking-tight text-text-primary"
         >
           <span
             aria-hidden="true"
-            className="flex h-7 w-7 items-center justify-center rounded-md border border-zinc-800 bg-zinc-900 font-mono text-sm text-emerald-400"
+            className="flex h-7 w-7 items-center justify-center rounded-md border border-border bg-background-elevated font-mono text-sm text-accent"
           >
-            &gt;_
+            {">&_"}
           </span>
-          <span className="flex items-center gap-2">
-            ViCode
-            <span className="hidden rounded border border-zinc-800 bg-zinc-900 px-1.5 py-0.5 text-[11px] font-normal text-zinc-400 sm:inline">
-              Terminal AI coding partner
-            </span>
-          </span>
+          <span>ViCode</span>
         </Link>
 
-        <div className="hidden items-center gap-2 sm:flex">
+        <div className="hidden items-center gap-1 sm:flex">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="rounded-md px-3 py-1.5 font-mono text-sm text-zinc-400 transition-colors hover:text-zinc-100"
+              className="rounded-md px-3 py-1.5 font-mono text-sm text-text-secondary transition-colors hover:text-text-primary"
             >
               {link.label}
             </Link>
@@ -53,30 +46,21 @@ export default function Navbar() {
         </div>
 
         <div className="hidden items-center gap-2 sm:flex">
-          <Link
-            href="#install"
-            className="rounded-md bg-emerald-500 px-3 py-1.5 font-mono text-sm font-semibold text-zinc-950 transition-colors hover:bg-emerald-400"
-          >
-            Install
-          </Link>
           <a
             href={GITHUB_URL}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="GitHub Star ViCode"
-            className="rounded-md border border-zinc-800 bg-zinc-900 px-3 py-1.5 font-mono text-sm text-zinc-200 transition-colors hover:border-zinc-700 hover:text-zinc-50"
+            aria-label="ViCode on GitHub"
+            className="rounded-md border border-border bg-background-elevated px-3 py-1.5 font-mono text-sm text-text-secondary transition-colors hover:border-border-strong hover:text-text-primary"
           >
-            ★ Star
+            GitHub
           </a>
-          <a
-            href={NPM_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="npm vicode-ai package"
-            className="rounded-md border border-zinc-800 bg-zinc-900 px-3 py-1.5 font-mono text-sm text-zinc-200 transition-colors hover:border-zinc-700 hover:text-zinc-50"
+          <Link
+            href="#install"
+            className="rounded-md bg-accent px-3 py-1.5 font-mono text-sm font-semibold text-background transition-colors hover:bg-accent-dim"
           >
-            npm
-          </a>
+            Get ViCode
+          </Link>
         </div>
 
         <button
@@ -84,7 +68,7 @@ export default function Navbar() {
           onClick={() => setOpen((prev) => !prev)}
           aria-expanded={open}
           aria-label="Toggle menu"
-          className="flex h-8 w-8 items-center justify-center rounded-md border border-zinc-800 text-zinc-400 transition-colors hover:text-zinc-100 sm:hidden"
+          className="flex h-8 w-8 items-center justify-center rounded-md border border-border text-text-secondary transition-colors hover:text-text-primary sm:hidden"
         >
           <svg
             aria-hidden="true"
@@ -110,7 +94,7 @@ export default function Navbar() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
-            className="overflow-hidden border-t border-zinc-800 sm:hidden"
+            className="overflow-hidden border-t border-border sm:hidden"
           >
             <div className="flex flex-col gap-1 px-4 py-3">
               {NAV_LINKS.map((link) => (
@@ -118,35 +102,28 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  className="rounded-md px-3 py-2 font-mono text-sm text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-zinc-100"
+                  className="rounded-md px-3 py-2 font-mono text-sm text-text-secondary transition-colors hover:bg-background-elevated hover:text-text-primary"
                 >
                   {link.label}
                 </Link>
               ))}
-              <div className="mt-2 flex flex-col gap-2 border-t border-zinc-800 pt-3">
-                <Link
-                  href="#install"
-                  onClick={() => setOpen(false)}
-                  className="rounded-md bg-emerald-500 px-3 py-2 text-center font-mono text-sm font-semibold text-zinc-950 transition-colors hover:bg-emerald-400"
-                >
-                  Install
-                </Link>
+              <div className="mt-2 flex flex-col gap-2 border-t border-border pt-3">
                 <a
                   href={GITHUB_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-center font-mono text-sm text-zinc-200 transition-colors hover:border-zinc-700 hover:text-zinc-50"
+                  onClick={() => setOpen(false)}
+                  className="rounded-md border border-border bg-background-elevated px-3 py-2 text-center font-mono text-sm text-text-secondary transition-colors hover:border-border-strong hover:text-text-primary"
                 >
-                  ★ Star
+                  GitHub
                 </a>
-                <a
-                  href={NPM_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-md border border-zinc-800 bg-zinc-900 px-3 py-2 text-center font-mono text-sm text-zinc-200 transition-colors hover:border-zinc-700 hover:text-zinc-50"
+                <Link
+                  href="#install"
+                  onClick={() => setOpen(false)}
+                  className="rounded-md bg-accent px-3 py-2 text-center font-mono text-sm font-semibold text-background transition-colors hover:bg-accent-dim"
                 >
-                  npm
-                </a>
+                  Get ViCode
+                </Link>
               </div>
             </div>
           </motion.div>

@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import React from "react";
 
 import ModesShowcase from "@/app/components/ModesShowcase";
-import Home from "@/app/page";
+import Guide from "@/app/guide/page";
 
 /**
  * Page-level behavioral seam for issue #5 (Modes hero showcase).
@@ -122,7 +122,7 @@ describe("modes hero showcase (issue #5)", () => {
   });
 
   it("page exposes the modes showcase as its own section", () => {
-    const { container } = render(<Home />);
+    const { container } = render(<Guide />);
 
     const modes = container.querySelector("#modes");
     expect(modes).not.toBeNull();

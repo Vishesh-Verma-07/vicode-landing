@@ -26,6 +26,7 @@ import { metadata } from "@/app/layout";
 import { GITHUB_URL, NPM_URL } from "@/app/lib/links";
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
+import Guide from "@/app/guide/page";
 import Home from "@/app/page";
 
 /**
@@ -52,7 +53,7 @@ describe("landing shell (issue #2)", () => {
       screen.getByRole("link", { name: /vicode home/i }),
     ).toBeInTheDocument();
     const install = screen.getByRole("link", { name: /install/i });
-    expect(install).toHaveAttribute("href", "#install");
+    expect(install).toHaveAttribute("href", "/guide#install");
     const star = screen.getByRole("link", { name: /github.*star/i });
     expect(star).toHaveAttribute("href", GITHUB_URL);
     expect(star).toHaveAttribute("target", "_blank");
@@ -72,8 +73,8 @@ describe("landing shell (issue #2)", () => {
     expect(hrefs).toContain(NPM_URL);
   });
 
-  it("page renders dark-only terminal shell with mono code typography and install anchor", () => {
-    const { container } = render(<Home />);
+  it("guide page renders dark-only terminal shell with mono code typography and install anchor", () => {
+    const { container } = render(<Guide />);
     // Dark-only shell: near-black background token on the top-level wrapper
     const shell = container.firstElementChild as HTMLElement;
     expect(shell.className).toMatch(/bg-zinc-950|bg-black|bg-\[#09090b\]/);
@@ -83,5 +84,11 @@ describe("landing shell (issue #2)", () => {
     expect(container.querySelector("#install")).not.toBeNull();
     // No light-mode styling leaks
     expect(container.innerHTML).not.toMatch(/bg-white|bg-zinc-50|dark:/);
+  });
+
+  it("home placeholder routes visitors to the guide", () => {
+    render(<Home />);
+    const guide = screen.getByRole("link", { name: /open the guide/i });
+    expect(guide).toHaveAttribute("href", "/guide");
   });
 });

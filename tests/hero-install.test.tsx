@@ -20,7 +20,7 @@ vi.mock("next/link", () => ({
 
 import { GITHUB_URL } from "@/app/lib/links";
 import Hero from "@/app/components/Hero";
-import Home from "@/app/page";
+import Guide from "@/app/guide/page";
 
 /**
  * Page-level behavioral seam for issue #3 (Hero Copy-install CTA + install tabs).
@@ -124,7 +124,7 @@ describe("hero copy-install CTA + install tabs (issue #3)", () => {
   });
 
   it("page exposes the hero inside the #install anchor", () => {
-    const { container } = render(<Home />);
+    const { container } = render(<Guide />);
     const install = container.querySelector("#install");
     expect(install).not.toBeNull();
     expect(install!.textContent).toMatch(/npm install -g vicode-ai/i);

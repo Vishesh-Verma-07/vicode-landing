@@ -1,165 +1,316 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { GITHUB_URL } from "../lib/links";
-import { INSTALL_TABS, type InstallManager } from "../lib/install";
+import { INSTALL_COMMAND } from "../lib/links";
 
-type CopyState = "idle" | "copied" | "manual";
+type DemoPhase = "discuss" | "plan" | "build";
+
+interface TerminalLine {
+  type: "prompt" | "user" | "assistant" | "status" | "plan" | "build" | "success" | "dim";
+  content: string;
+  delay?: number;
+}
+
+const DEMO_SCRIPT: Record<DemoPhase, TerminalLine[]> = {
+  discuss: [
+    { type: "prompt", content: "vicode", delay: 0 },
+    { type: "status", content: "DISCUSS", delay: 300 },
+    { type: "user", content: "> I want to add authentication to my API.", delay: 800 },
+    { type: "assistant", content: "Let's clarify a few things first. Are you using sessions or JWTs? And should authentication apply to every route or only selected endpoints?", delay: 1500 },
+  ],
+  plan: [
+    { type: "prompt", content: "vicode", delay: 0 },
+    { type: "plan", content: "PLAN", delay: 300 },
+    { type: "status", content: "Proposed plan", delay: 600 },
+    { type: "plan", content: "01  Inspect the existing API structure", delay: 900 },
+    { type: "plan", content: "02  Define the authentication flow", delay: 1200 },
+    { type: "plan", content: "03  Implement middleware and protected routes", delay: 1500 },
+    { type: "plan", content: "04  Verify the changes", delay: 1800 },
+    { type: "assistant", content: "Plan ready for your review.", delay: 2200 },
+  ],
+  build: [
+    { type: "prompt", content: "vicode", delay: 0 },
+    { type: "build", content: "BUILD", delay: 300 },
+    { type: "status", content: "Executing approved plan...", delay: 600 },
+    { type: "success", content: "✓ Middleware updated", delay: 1000 },
+    { type: "success", content: "✓ Protected routes implemented", delay: 1400 },
+    { type: "success", content: "✓ Existing conventions preserved", delay: 1800 },
+    { type: "assistant", content: "Changes ready for review.", delay: 2200 },
+  ],
+};
+
+const PHASE_LABELS: Record<DemoPhase, { label: string; color: string }> = {
+  discuss: { label: "DISCUSS", color: "text-discuss" },
+  plan: { label: "PLAN", color: "text-plan" },
+  build: { label: "BUILD", color: "text-build" },
+};
+
+const PHASE_ORDER: DemoPhase[] = ["discuss", "plan", "build"];
+
+function getInitialReducedMotion(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function TerminalDemo({
+  phase,
+  prefersReducedMotion,
+}: {
+  phase: DemoPhase;
+  prefersReducedMotion: boolean;
+}) {
+  const [visibleLines, setVisibleLines] = useState<TerminalLine[]>(() => {
+    if (prefersReducedMotion) {
+      return DEMO_SCRIPT[phase];
+    }
+    return [];
+  });
+  const [isAnimating, setIsAnimating] = useState(!prefersReducedMotion);
+  const animationRef = useRef(0);
+  const phaseRef = useRef(phase);
+
+  useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
+
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      setTimeout(() => {
+        setVisibleLines(DEMO_SCRIPT[phase]);
+        setIsAnimating(false);
+      }, 0);
+      return;
+    }
+
+    const lines = DEMO_SCRIPT[phase];
+    animationRef.current += 1;
+    const currentAnimation = animationRef.current;
+
+    let cancelled = false;
+
+    const runAnimation = async () => {
+      setVisibleLines([]);
+      setIsAnimating(true);
+
+      for (let i = 0; i < lines.length; i++) {
+        if (cancelled || animationRef.current !== currentAnimation) return;
+        await new Promise(resolve => setTimeout(resolve, lines[i].delay || 300));
+        if (cancelled || animationRef.current !== currentAnimation) return;
+        setVisibleLines(prev => [...prev, lines[i]]);
+      }
+      if (!cancelled && animationRef.current === currentAnimation) {
+        setIsAnimating(false);
+      }
+    };
+
+    runAnimation();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [phase, prefersReducedMotion]);
+
+  const currentPhaseInfo = PHASE_LABELS[phase];
+
+  return (
+    <div className="terminal-window" data-terminal>
+      <div className="terminal-titlebar">
+        <span className="terminal-dot terminal-dot-close" aria-hidden="true" />
+        <span className="terminal-dot terminal-dot-minimize" aria-hidden="true" />
+        <span className="terminal-dot terminal-dot-maximize" aria-hidden="true" />
+        <span className="font-mono text-xs text-text-muted ml-2">vicode</span>
+        <span className="font-mono text-xs text-text-muted mx-2">~/project</span>
+      </div>
+
+      <div className="terminal-body min-h-[320px] max-h-[480px] overflow-y-auto">
+        <div className="flex items-center gap-2 mb-4 font-mono text-xs text-text-muted">
+          <span className={`animate-pulse-subtle ${currentPhaseInfo.color}`}>●</span>
+          <span>{currentPhaseInfo.label}</span>
+          <span className="text-border">|</span>
+          <span>Tab to cycle modes</span>
+        </div>
+
+        <div className="font-mono text-sm leading-relaxed" role="log" aria-live="polite" aria-label="ViCode demo session">
+          {visibleLines.map((line, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2, delay: prefersReducedMotion ? 0 : index * 0.05 }}
+              className={`${line.type} whitespace-pre-wrap break-all`}
+            >
+              {line.content}
+            </motion.div>
+          ))}
+          {isAnimating && !prefersReducedMotion && (
+            <motion.span
+              className="terminal-prompt animate-pulse-subtle"
+              aria-hidden="true"
+            >
+              █
+            </motion.span>
+          )}
+        </div>
+      </div>
+
+      <div className="terminal-titlebar border-t border-border">
+        <div className="flex items-center gap-4 w-full">
+          <div className="flex items-center gap-2">
+            {PHASE_ORDER.map((p) => (
+              <button
+                key={p}
+                onClick={() => {}}
+                className={`px-2 py-1 rounded text-xs font-mono transition-colors ${
+                  phase === p
+                    ? "bg-accent-bg text-accent border border-accent-border"
+                    : "text-text-muted hover:text-text-secondary"
+                }`}
+                aria-pressed={phase === p}
+              >
+                {p.toUpperCase()}
+              </button>
+            ))}
+          </div>
+          <span className="font-mono text-xs text-text-muted ml-auto">
+            Simulated demo · Not a live session
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Hero() {
-  const [managerId, setManagerId] = useState<InstallManager>("npm");
-  const [copyState, setCopyState] = useState<CopyState>("idle");
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
+  const [currentPhase, setCurrentPhase] = useState<DemoPhase>("discuss");
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(getInitialReducedMotion);
+  const [cycleCount, setCycleCount] = useState(0);
+  const phaseIndexRef = useRef(0);
 
-  const active =
-    INSTALL_TABS.find((tab) => tab.id === managerId) ?? INSTALL_TABS[0];
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mediaQuery.addEventListener("change", handler);
+    return () => mediaQuery.removeEventListener("change", handler);
+  }, []);
+
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+    
+    const timer = setTimeout(() => {
+      const nextIndex = (phaseIndexRef.current + 1) % PHASE_ORDER.length;
+      phaseIndexRef.current = nextIndex;
+      setCurrentPhase(PHASE_ORDER[nextIndex]);
+      if (nextIndex === 0) {
+        setCycleCount(c => c + 1);
+      }
+    }, 4000);
+    
+    return () => clearTimeout(timer);
+  }, [currentPhase, prefersReducedMotion, cycleCount]);
 
   async function copyInstallCommand() {
-    const command = active.command;
     try {
-      const clipboard = navigator?.clipboard;
-      if (clipboard?.writeText) {
-        await clipboard.writeText(command);
-        setCopyState("copied");
-        return;
-      }
-      const textarea = document.createElement("textarea");
-      textarea.value = command;
-      textarea.setAttribute("readonly", "");
-      textarea.style.position = "absolute";
-      textarea.style.opacity = "0";
-      document.body.appendChild(textarea);
-      textarea.select();
-      const ok = document.execCommand("copy");
-      document.body.removeChild(textarea);
-      setCopyState(ok ? "copied" : "manual");
+      await navigator.clipboard.writeText(INSTALL_COMMAND);
+      setCopyState("copied");
+      setTimeout(() => setCopyState("idle"), 2000);
     } catch {
-      setCopyState("manual");
+      setCopyState("error");
+      setTimeout(() => setCopyState("idle"), 2000);
     }
   }
 
   return (
-    <section aria-label="Install ViCode" className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4">
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-          className="font-mono text-sm text-zinc-400"
-        >
-          <span className="text-emerald-400">$</span> Terminal AI coding partner
-        </motion.p>
-        <motion.h1
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
-          className="text-3xl font-semibold tracking-tight text-zinc-50 sm:text-4xl lg:text-5xl"
-        >
-          ViCode — think through problems, build solutions
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.2 }}
-          className="max-w-2xl text-base leading-relaxed text-zinc-400"
-        >
-          A conversational CLI coding partner built to help you think through
-          problems, create a plan, and build the solution with you in control
-          every step of the way.
-        </motion.p>
-      </div>
+    <section aria-labelledby="hero-heading" className="relative overflow-hidden py-16 sm:py-24 lg:py-32">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
+          <div className="flex flex-col gap-6 text-center lg:text-left">
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+              className="font-mono text-sm text-text-secondary"
+            >
+              AN OPEN-SOURCE CLI CODING PARTNER
+            </motion.p>
 
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.3 }}
-        className="flex flex-col gap-3"
-      >
-        <div
-          role="tablist"
-          aria-label="Package manager"
-          className="flex flex-wrap gap-2"
-        >
-          {INSTALL_TABS.map((tab) => (
-            <button
-              key={tab.id}
-              role="tab"
-              aria-selected={managerId === tab.id}
-              aria-label={`${tab.label} install`}
-              onClick={() => {
-                setManagerId(tab.id);
-                setCopyState("idle");
-              }}
-              className={`rounded-md border px-3 py-1.5 font-mono text-sm transition-colors ${
-                managerId === tab.id
-                  ? "border-emerald-500/60 bg-emerald-500/10 text-emerald-300"
-                  : "border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200"
-              }`}
+            <motion.h1
+              id="hero-heading"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1], delay: 0.1 }}
+              className="text-4xl font-semibold tracking-tight text-text-primary sm:text-5xl lg:text-6xl"
             >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+              Think it through.
+              <br />
+              <span className="text-accent">Then build it.</span>
+            </motion.h1>
 
-        <div className="flex flex-col gap-3 rounded-lg border border-zinc-800 bg-black p-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="overflow-x-auto font-mono text-sm text-zinc-100">
-            <span className="select-none text-zinc-500">$ </span>
-            {active.command}
-          </p>
-          <div className="flex shrink-0 items-center gap-2">
-            <motion.button
-              type="button"
-              onClick={copyInstallCommand}
-              aria-label="Copy install command"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
-              className="rounded-md bg-emerald-500 px-4 py-2 font-mono text-sm font-semibold text-zinc-950 transition-colors hover:bg-emerald-400"
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.2 }}
+              className="max-w-xl text-base leading-relaxed text-text-secondary"
             >
-              Copy
-            </motion.button>
-            <a
-              href={GITHUB_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="GitHub Star ViCode"
-              className="rounded-md border border-zinc-800 bg-zinc-900 px-4 py-2 font-mono text-sm text-zinc-200 transition-colors hover:border-zinc-700 hover:text-zinc-50"
+              From a rough idea to a reviewed plan to working code. ViCode helps you think clearly, build deliberately, and stay in control at every step.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.3 }}
+              className="flex flex-col gap-3 sm:flex-row sm:items-center"
             >
-              ★ Star
-            </a>
+              <button
+                onClick={copyInstallCommand}
+                className="rounded-md bg-accent px-6 py-3 font-mono text-sm font-semibold text-background transition-colors hover:bg-accent-dim focus-visible-ring"
+              >
+                Get Started
+              </button>
+              <a
+                href={GITHUB_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-md border border-border bg-background-elevated px-6 py-3 font-mono text-sm text-text-secondary transition-colors hover:border-border-strong hover:text-text-primary text-center"
+              >
+                Explore on GitHub
+              </a>
+            </motion.div>
+
+            {copyState !== "idle" && (
+              <motion.p
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="font-mono text-xs"
+              >
+                {copyState === "copied" && <span className="text-accent">Copied to clipboard</span>}
+                {copyState === "error" && <span className="text-red-400">Failed to copy</span>}
+              </motion.p>
+            )}
+
+            <motion.p
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.4 }}
+              className="font-mono text-xs text-text-muted tracking-wider uppercase"
+            >
+              OPEN SOURCE · TERMINAL NATIVE · DEVELOPER CONTROLLED
+            </motion.p>
           </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1], delay: 0.2 }}
+            className="relative"
+          >
+            <TerminalDemo phase={currentPhase} prefersReducedMotion={prefersReducedMotion} />
+          </motion.div>
         </div>
-
-        <p role="status" aria-live="polite" className="min-h-5 font-mono text-sm">
-          {copyState === "copied" && (
-            <span className="text-emerald-400">Copied to clipboard</span>
-          )}
-          {copyState === "manual" && (
-            <span className="text-amber-300">
-              Copy manually: {active.command}
-            </span>
-          )}
-        </p>
-      </motion.div>
-
-      <motion.ul
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1], delay: 0.4 }}
-        aria-label="Requirements"
-        className="flex flex-col gap-2 rounded-lg border border-zinc-800 bg-zinc-900/60 p-4 font-mono text-sm text-zinc-400 sm:flex-row sm:flex-wrap sm:gap-x-6"
-      >
-        <li>
-          <span className="text-zinc-200">Node 22+</span> required
-        </li>
-        <li>
-          <span className="text-zinc-200">OpenRouter API key</span> required
-        </li>
-        <li>
-          <span className="text-zinc-200">bash on PATH</span> required on
-          Windows (Git Bash or WSL)
-        </li>
-      </motion.ul>
+      </div>
     </section>
   );
 }
